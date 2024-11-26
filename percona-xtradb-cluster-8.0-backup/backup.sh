@@ -84,7 +84,6 @@ function request_streaming() {
             --md5 $XBCLOUD_ARGS \
             --s3-bucket="$S3_BUCKET" \
             "$S3_BUCKET_PATH" 2>&1 &
-    local XBCLOUD_PID=$!
 
     set +o errexit
     log 'INFO' 'Garbd was started'
@@ -94,18 +93,10 @@ function request_streaming() {
         --group "$PXC_SERVICE" \
         --options "$GARBD_OPTS" \
         --sst "xtrabackup-v2:$LOCAL_IP:4444/xtrabackup_sst//1" \
-        --recv-script="/usr/bin/run_backup.sh" \
-        --post-recv-script="/usr/bin/post_backup.sh"
+        --recv-script="/usr/bin/run_backup.sh"
     EXID_CODE=$?
 
-    wait ${XBCLOUD_PID}
-
     if [ -f '/tmp/backup-is-completed' ]; then
-        if [[ $EXID_CODE != 0 ]]; then
-            log 'ERROR' "Backup was finished successfully but garbd exited with ${EXID_CODE}."
-            exit $EXID_CODE
-        fi
-
         log 'INFO' 'Backup was finished successfully'
         exit 0
     fi
