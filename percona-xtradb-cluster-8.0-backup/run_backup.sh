@@ -111,9 +111,10 @@ backup_s3() {
 
 	if (($SST_FAILED == 0)); then
 		FIRST_RECEIVED=0
-		socat -u "$SOCAT_OPTS" stdio \
-			| xbcloud put --storage=s3 --parallel="$(grep -c processor /proc/cpuinfo)" --md5 $XBCLOUD_ARGS --s3-bucket="$S3_BUCKET" "$S3_BUCKET_PATH" 2>&1 \
-			| (grep -v "error: http request failed: Couldn't resolve host name" || exit 1)
+		socat -u "$SOCAT_OPTS" stdio > /tmp/sstdata
+
+			# | xbcloud put --storage=s3 --parallel="$(grep -c processor /proc/cpuinfo)" --md5 $XBCLOUD_ARGS --s3-bucket="$S3_BUCKET" "$S3_BUCKET_PATH" 2>&1 \
+			# | (grep -v "error: http request failed: Couldn't resolve host name" || exit 1)
 		FIRST_RECEIVED=1
 	fi
 }
